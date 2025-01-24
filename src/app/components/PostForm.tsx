@@ -2,12 +2,39 @@
 import { Box, Button, Fab, Modal, TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import React, { useState } from 'react';
+import { db } from '../firebase/config';
+import { collection, addDoc, serverTimestamp } from "firebase/firestore"
+import { useAuth } from '../contexts/AuthContext';
 
 
 export default function PostForm() {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+  const [content, setContent] = useState("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // console.log("投稿処理：", content);
+    if (!content.trim() || !user) return;
+    try {
+      const docRef = await addDoc(collection(db, "posts"), {
+        content,
+        createdAt: serverTimestamp(),
+        auther: {
+          uid: user.uid,
+          displayName: user.displayName,
+          photoURL: user.photoURL
+        }
+      })
+      console.log("Success ! with ID：", docRef.id);
+      setContent("");
+    } catch (error) {
+      console.log("投稿エラー", error);
+      alert("投稿に失敗しました！");
+    }
+    handleClose();
+  };
   return (
     <>
       <Fab
@@ -16,7 +43,7 @@ export default function PostForm() {
         aria-label="投稿"
         sx={{
           position: "fixed",
-          bottom: 16,
+          bottom: 66,
           left: 16,
           zIndex: 1000,
         }}
@@ -37,7 +64,7 @@ export default function PostForm() {
             borderRadius: 2,
           }}
         >
-          <form>
+          <form onSubmit={handleSubmit}>
             <TextField
               fullWidth
               multiline
@@ -45,6 +72,7 @@ export default function PostForm() {
               variant="outlined"
               placeholder="Let's Tweet!!!"
               sx={{ mb: 2 }}
+              onChange={(e) => setContent(e.target.value)}
             />
             <Box
               sx={{

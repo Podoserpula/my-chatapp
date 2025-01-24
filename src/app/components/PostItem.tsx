@@ -5,7 +5,7 @@ import React from 'react'
 interface Post {
   id: string;
   content: string;
-  createAt: Date | { toDate: () => Date } | null;
+  createdAt: Date | { toDate: () => Date } | null;
   author: {
     uid: string;
     displayName: string;
@@ -23,14 +23,14 @@ export default function PostItem({ post }: { post: Post }) {
   }
   // console.log(post);
   return (
-    <Card>
+    <Card sx={{ mb: 2 }}>
       <CardContent>
-        <Box display="flex" alignItems="center">
-          <Avatar src={post.author.photoURL} alt={post.author.displayName} />
+        <Box display="flex" alignItems="center" sx={{ mb: 2 }}>
+          <Avatar src={post.author.photoURL} alt={post.author.displayName} sx={{ br: 1 }} />
           {post.author.displayName}
         </Box>
-        <Box>{post.content}</Box>
-        <Box>{formatDate(post.createAt)}</Box>
+        <Box sx={{ mb: 2 }}>{post.content}</Box>
+        <Box>{formatDate(post.createdAt)}</Box>
       </CardContent>
     </Card>
 
